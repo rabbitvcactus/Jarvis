@@ -6,6 +6,8 @@ import discord
 import json
 import logging
 import re
+import datetime
+from time import sleep
 
 description = """
 Hello! I am a bot written by Tom to provide some nice utilities and banter.
@@ -29,7 +31,7 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-
+    bot.send_message(bot.get_server(server_id).get_channel(264449838589018112), 'Jarvis is now online.')
 
 @bot.event
 async def on_resumed():
@@ -151,6 +153,7 @@ async def colour(ctx, hex: str):
 @bot.command(pass_context=True)
 async def removeRedundantColours(ctx):
     """Sends the issuers id, roles."""
+    toDelete = []
     for role in bot.get_server(server_id).roles:
         memberswithrole = 0
         for member in bot.get_server(server_id).members:
@@ -161,14 +164,82 @@ async def removeRedundantColours(ctx):
             restring = re.compile(r"^#[0-9A-F]{6}$")
             match = re.search(restring, role.name)
             if match:
+                toDelete.append(role.name)
+                sleep(0.1)
                 await bot.delete_role(bot.get_server(server_id), role)
+    block = ""
+    if not toDelete:
+        await bot.say("No Roles to delete.")
+    else:
+        for roleName in toDelete:
+            block += str(roleName + "\n")
+        await bot.say(("`" * 3) + block + ("`" * 3))
+
+"""@bot.command(pass_context=True)
+async def IDList(ctx):
+    \"""Sends the issuers id, roles.\"""
+    await bot.say(ctx.message.author)
+    await bot.say(ctx.message.author.roles)"""
+
+
+def getUserColour(user):
+    for role in user.roles:
+        if role.name.startswith('#'):
+            return role.colour.value
+
+
+def getJoinDate(ID):
+    for member in bot.get_server(server_id).members:
+        if member.id == ID:
+            return member.joined_at
+
 
 @bot.command(pass_context=True)
-async def IDList(ctx):
-    """Sends the issuers id, roles."""
-    await bot.say(ctx.message.author)
-    await bot.say(ctx.message.author.roles)
+async def userInfo(ctx, ID: str = None):
+    """Sends the Send ID's Info, if no ID give, sends yours."""
+    try:
+        if not ID:
+            embed = discord.Embed(colour=discord.Colour(getUserColour(ctx.message.author)), description=str("Info about user: "+str(ctx.message.author.name)), timestamp=datetime.datetime.utcnow())
 
+            embed.set_thumbnail(url=str(ctx.message.author.avatar_url))
+            embed.set_author(name=str(ctx.message.author.name), icon_url=str(ctx.message.author.avatar_url))
+            embed.set_footer(text="Description from (Server time)", icon_url=str(ctx.message.author.avatar_url))
+
+            embed.add_field(name="Name:", value=ctx.message.author.name)
+            embed.add_field(name="ID:", value=str(ctx.message.author.id))
+            embed.add_field(name="Mention string:", value=str(ctx.message.author.mention))
+            embed.add_field(name="Account Created at:", value=str(ctx.message.author.created_at))
+            embed.add_field(name="Joined server at:", value=str(getJoinDate(ctx.message.author.id)))
+            embed.add_field(name="Display Name:", value=str(ctx.message.author.display_name))
+            await bot.say(embed=embed)
+        elif bot.get_server(server_id).get_member(ID) is not None:
+            member = bot.get_server(server_id).get_member(ID)
+            embed = discord.Embed(colour=discord.Colour(getUserColour(member)), description=str("Info about user: "+str(member.name)), timestamp=datetime.datetime.utcnow())
+
+            embed.set_thumbnail(url=str(member.avatar_url))
+            embed.set_author(name=str(member.name), icon_url=str(member.avatar_url))
+            embed.set_footer(text="Description from (Server time)", icon_url=str(member.avatar_url))
+
+            embed.add_field(name="Name:", value=member.name)
+            embed.add_field(name="ID:", value=str(member.id))
+            embed.add_field(name="Mention string:", value=str(member.mention))
+            embed.add_field(name="Account Created at:", value=str(member.created_at))
+            embed.add_field(name="Joined server at:", value=str(getJoinDate(member.id)))
+            embed.add_field(name="Display Name:", value=str(member.display_name))
+            await bot.say(embed=embed)
+        elif bot.get_user_info(ID) is not None:
+            user = await bot.get_user_info(ID)
+            embed = discord.Embed(colour=discord.Colour(random.randint(1, 16777214)), description=str("Info about user: "+str(user.name)), timestamp=datetime.datetime.utcnow())
+            embed.set_thumbnail(url=str(user.avatar_url))
+            embed.set_author(name=str(user.name), icon_url=str(user.avatar_url))
+            embed.set_footer(text="Description from (Server time)", icon_url=str(user.avatar_url))
+
+            embed.add_field(name="Name:", value=user.name)
+            embed.add_field(name="ID:", value=str(user.id))
+            embed.add_field(name="Account Created at:", value=str(user.created_at))
+            await bot.say(embed=embed)
+    except discord.NotFound:
+        await bot.say("UserID doesn't exist...")
 
 @bot.command(pass_context=True)
 async def rolePos(ctx, roleName: str):
