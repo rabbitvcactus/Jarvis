@@ -31,7 +31,7 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-    bot.send_message(bot.get_server(server_id).get_channel(264449838589018112), 'Jarvis is now online.')
+    await bot.send_message(bot.get_server(server_id), 'Jarvis is now online.')
 
 
 @bot.event
