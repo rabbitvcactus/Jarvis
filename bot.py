@@ -33,6 +33,7 @@ async def on_ready():
     print('------')
     bot.send_message(bot.get_server(server_id).get_channel(264449838589018112), 'Jarvis is now online.')
 
+
 @bot.event
 async def on_resumed():
     print('resumed...')
@@ -150,6 +151,7 @@ async def colour(ctx, hex: str):
     else:
         await bot.say(hex + " is not in the hex form #A1B2C3.")
 
+
 @bot.command(pass_context=True)
 async def removeRedundantColours(ctx):
     """Sends the issuers id, roles."""
@@ -197,6 +199,7 @@ def getJoinDate(ID):
 @bot.command(pass_context=True)
 async def userInfo(ctx, ID: str = None):
     """Sends the Send ID's Info, if no ID give, sends yours."""
+    dateFormat = '%a %b %-d, %Y @ %H:%M'
     try:
         if not ID:
             embed = discord.Embed(colour=discord.Colour(getUserColour(ctx.message.author)), description=str("Info about user: "+str(ctx.message.author.name)), timestamp=datetime.datetime.utcnow())
@@ -208,8 +211,8 @@ async def userInfo(ctx, ID: str = None):
             embed.add_field(name="Name:", value=ctx.message.author.name)
             embed.add_field(name="ID:", value=str(ctx.message.author.id))
             embed.add_field(name="Mention string:", value=str(ctx.message.author.mention))
-            embed.add_field(name="Account Created at:", value=str(ctx.message.author.created_at))
-            embed.add_field(name="Joined server at:", value=str(getJoinDate(ctx.message.author.id)))
+            embed.add_field(name="Account Created at:", value=str(ctx.message.author.created_at.strftime(dateFormat)))
+            embed.add_field(name="Joined server at:", value=str(getJoinDate(ctx.message.author.id).strftime(dateFormat)))
             embed.add_field(name="Display Name:", value=str(ctx.message.author.display_name))
             await bot.say(embed=embed)
         elif bot.get_server(server_id).get_member(ID) is not None:
@@ -223,8 +226,8 @@ async def userInfo(ctx, ID: str = None):
             embed.add_field(name="Name:", value=member.name)
             embed.add_field(name="ID:", value=str(member.id))
             embed.add_field(name="Mention string:", value=str(member.mention))
-            embed.add_field(name="Account Created at:", value=str(member.created_at))
-            embed.add_field(name="Joined server at:", value=str(getJoinDate(member.id)))
+            embed.add_field(name="Account Created at:", value=str(member.created_at.strftime(dateFormat)))
+            embed.add_field(name="Joined server at:", value=str(getJoinDate(member.id).strftime(dateFormat)))
             embed.add_field(name="Display Name:", value=str(member.display_name))
             await bot.say(embed=embed)
         elif bot.get_user_info(ID) is not None:
@@ -236,15 +239,17 @@ async def userInfo(ctx, ID: str = None):
 
             embed.add_field(name="Name:", value=user.name)
             embed.add_field(name="ID:", value=str(user.id))
-            embed.add_field(name="Account Created at:", value=str(user.created_at))
+            embed.add_field(name="Account Created at:", value=str(user.created_at.strftime(dateFormat)))
             await bot.say(embed=embed)
     except discord.NotFound:
         await bot.say("UserID doesn't exist...")
+
 
 @bot.command(pass_context=True)
 async def rolePos(ctx, roleName: str):
     """Sends the position value of the role."""
     await bot.say(discord.utils.get(bot.get_server(server_id).roles, name=roleName).position)
+
 
 @bot.command(pass_context=True)
 async def insultMe(ctx, member: discord.Member = None):
