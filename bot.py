@@ -124,7 +124,7 @@ async def add(left: int, right: int):
 @bot.command()
 async def git():
     """Sends Discord-board-game repo link."""
-    await bot.say('https://github.com/Skidushe/Discord-board-game')
+    await bot.say('https://github.com/Skidushe')
 
 
 @bot.command()
