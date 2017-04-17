@@ -14,7 +14,7 @@ Hello! I am a bot written by Tom to provide some nice utilities and banter.
 """
 
 logger = logging.getLogger('discord')
-logger.setLevel(logging.CRITICAL)
+logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(
     filename='discordBot.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter(
@@ -92,6 +92,27 @@ async def on_message(message):
             await bot.send_message(message.channel, 'Sorry. It is actually {}.'.format(answer))
 
     await bot.process_commands(message)
+
+
+@bot.event
+async def on_message_delete(message):
+    fmt = '**{0.author}** has deleted the message:\n```{0.content}```'
+    editChannel = bot.get_channel('303505920879493120')
+    await bot.send_message(editChannel, fmt.format(message))
+
+
+@bot.event
+async def on_message_edit(before, after):
+    fmt = '**{0.author}** edited their message:```\n{1.content}\n```to:\n```\n{0.content}\n```'
+    editChannel = bot.get_channel('303505920879493120')
+    await bot.send_message(editChannel, fmt.format(after, before))
+
+
+@bot.event
+async def on_member_join(member):
+    server = member.server
+    fmt = 'Welcome {0.mention} to {1.name}!'
+    await bot.send_message(server, fmt.format(member, server))
 
 
 @bot.command()
