@@ -8,6 +8,8 @@ import logging
 import re
 import datetime
 from time import sleep
+import urllib.request
+import os
 
 description = """
 Hello! I am a bot written by Tom to provide some nice utilities and banter.
@@ -218,49 +220,66 @@ def getJoinDate(ID):
 
 
 @bot.command(pass_context=True)
-async def userInfo(ctx, ID: str = None):
+async def userInfo(ctx, ID: str=None):
     """Sends the Send ID's Info, if no ID give, sends yours."""
     dateFormat = '%a %b %-d, %Y @ %H:%M'
     try:
         if not ID:
-            embed = discord.Embed(colour=discord.Colour(getUserColour(ctx.message.author)), description=str("Info about user: "+str(ctx.message.author.name)), timestamp=datetime.datetime.utcnow())
+            embed = discord.Embed(colour=discord.Colour(getUserColour(ctx.message.author)), description=str(
+                "Info about user: " + str(ctx.message.author.name)), timestamp=datetime.datetime.utcnow())
 
             embed.set_thumbnail(url=str(ctx.message.author.avatar_url))
-            embed.set_author(name=str(ctx.message.author.name), icon_url=str(ctx.message.author.avatar_url))
-            embed.set_footer(text="Description from (Server time)", icon_url=str(ctx.message.author.avatar_url))
+            embed.set_author(name=str(ctx.message.author.name),
+                             icon_url=str(ctx.message.author.avatar_url))
+            embed.set_footer(text="Description from (Server time)",
+                             icon_url=str(ctx.message.author.avatar_url))
 
             embed.add_field(name="Name:", value=ctx.message.author.name)
             embed.add_field(name="ID:", value=str(ctx.message.author.id))
-            embed.add_field(name="Mention string:", value=str(ctx.message.author.mention))
-            embed.add_field(name="Account Created at:", value=str(ctx.message.author.created_at.strftime(dateFormat)))
-            embed.add_field(name="Joined server at:", value=str(getJoinDate(ctx.message.author.id).strftime(dateFormat)))
-            embed.add_field(name="Display Name:", value=str(ctx.message.author.display_name))
+            embed.add_field(name="Mention string:",
+                            value=str(ctx.message.author.mention))
+            embed.add_field(name="Account Created at:", value=str(
+                ctx.message.author.created_at.strftime(dateFormat)))
+            embed.add_field(name="Joined server at:", value=str(
+                getJoinDate(ctx.message.author.id).strftime(dateFormat)))
+            embed.add_field(name="Display Name:", value=str(
+                ctx.message.author.display_name))
             await bot.say(embed=embed)
         elif bot.get_server(server_id).get_member(ID) is not None:
             member = bot.get_server(server_id).get_member(ID)
-            embed = discord.Embed(colour=discord.Colour(getUserColour(member)), description=str("Info about user: "+str(member.name)), timestamp=datetime.datetime.utcnow())
+            embed = discord.Embed(colour=discord.Colour(getUserColour(member)), description=str(
+                "Info about user: " + str(member.name)), timestamp=datetime.datetime.utcnow())
 
             embed.set_thumbnail(url=str(member.avatar_url))
-            embed.set_author(name=str(member.name), icon_url=str(member.avatar_url))
-            embed.set_footer(text="Description from (Server time)", icon_url=str(member.avatar_url))
+            embed.set_author(name=str(member.name),
+                             icon_url=str(member.avatar_url))
+            embed.set_footer(text="Description from (Server time)",
+                             icon_url=str(member.avatar_url))
 
             embed.add_field(name="Name:", value=member.name)
             embed.add_field(name="ID:", value=str(member.id))
             embed.add_field(name="Mention string:", value=str(member.mention))
-            embed.add_field(name="Account Created at:", value=str(member.created_at.strftime(dateFormat)))
-            embed.add_field(name="Joined server at:", value=str(getJoinDate(member.id).strftime(dateFormat)))
-            embed.add_field(name="Display Name:", value=str(member.display_name))
+            embed.add_field(name="Account Created at:", value=str(
+                member.created_at.strftime(dateFormat)))
+            embed.add_field(name="Joined server at:", value=str(
+                getJoinDate(member.id).strftime(dateFormat)))
+            embed.add_field(name="Display Name:",
+                            value=str(member.display_name))
             await bot.say(embed=embed)
         elif bot.get_user_info(ID) is not None:
             user = await bot.get_user_info(ID)
-            embed = discord.Embed(colour=discord.Colour(random.randint(1, 16777214)), description=str("Info about user: "+str(user.name)), timestamp=datetime.datetime.utcnow())
+            embed = discord.Embed(colour=discord.Colour(random.randint(1, 16777214)), description=str(
+                "Info about user: " + str(user.name)), timestamp=datetime.datetime.utcnow())
             embed.set_thumbnail(url=str(user.avatar_url))
-            embed.set_author(name=str(user.name), icon_url=str(user.avatar_url))
-            embed.set_footer(text="Description from (Server time)", icon_url=str(user.avatar_url))
+            embed.set_author(name=str(user.name),
+                             icon_url=str(user.avatar_url))
+            embed.set_footer(text="Description from (Server time)",
+                             icon_url=str(user.avatar_url))
 
             embed.add_field(name="Name:", value=user.name)
             embed.add_field(name="ID:", value=str(user.id))
-            embed.add_field(name="Account Created at:", value=str(user.created_at.strftime(dateFormat)))
+            embed.add_field(name="Account Created at:", value=str(
+                user.created_at.strftime(dateFormat)))
             await bot.say(embed=embed)
     except discord.NotFound:
         await bot.say("UserID doesn't exist...")
@@ -273,7 +292,7 @@ async def rolePos(ctx, roleName: str):
 
 
 @bot.command(pass_context=True)
-async def insultMe(ctx, member: discord.Member = None):
+async def insultMe(ctx, member: discord.Member=None):
     """Sends an insult about the sender."""
     if member is None:
         member = ctx.message.author
@@ -282,7 +301,7 @@ async def insultMe(ctx, member: discord.Member = None):
     for line in insults:
         insultsArray.append(str(line))
     ran = random.randint(1, len(insultsArray))
-    await bot.say('{0}'.format(member)+" "+str(insultsArray[ran]))
+    await bot.say('{0}'.format(member) + " " + str(insultsArray[ran]))
 
 
 @bot.command(pass_context=True)
@@ -324,6 +343,42 @@ async def choose(*choices: str):
 async def joined(member: discord.Member):
     """Says when a member joined."""
     await bot.say('{0.name} joined in {0.joined_at}'.format(member))
+
+
+def generate_image_online(latex, number):
+    url = 'http://frog.isima.fr/cgi-bin/bruno/tex2png--10.cgi?'
+    url += urllib.parse.quote(latex, safe='')
+    fn = str(number) + '.png'
+    urllib.request.urlretrieve(url, fn)
+    return fn
+
+
+# Removes the generated output files for a given name
+def cleanup_output_files(outputnum):
+    try:
+        os.remove(outputnum + '.png')
+        os.remove(outputnum + '.tex')
+        os.remove(outputnum + '.dvi')
+        os.remove(outputnum + '.aux')
+        os.remove(outputnum + '.log')
+    except OSError:
+        pass
+
+
+@bot.command(pass_context=True)
+async def latex(ctx, *, eq: str):
+    """Returns png of latex given."""
+    latex = eq.strip()
+    num = str(random.randint(0, 2 ** 31))
+    fn = generate_image_online(latex, num)
+    if fn and os.path.getsize(fn) > 0:
+        await bot.send_file(ctx.message.channel, fn)
+        cleanup_output_files(num)
+        print('Success!')
+    else:
+        await bot.say('Something broke. Check the syntax of your message. :frowning:')
+        cleanup_output_files(num)
+        print('Failure.')
 
 
 def load_credentials():
