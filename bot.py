@@ -305,7 +305,7 @@ async def insultMe(ctx, member: discord.Member=None):
 
 
 @bot.command(pass_context=True)
-async def birthday(ctx, member: discord.Member=None):
+async def birthday(ctx, member: str=None):
     """Sends an insult about the sender."""
     if member is None:
         recipient = ctx.message.author
@@ -313,7 +313,7 @@ async def birthday(ctx, member: discord.Member=None):
         recipient = bot.get_server(server_id).get_member(member)
     await bot.say("Happy birthday to you,")
     await bot.say("Happy birthday to you,")
-    await bot.say("Happy birthday dear, " + member.mention + "...")
+    await bot.say("Happy birthday dear, " + recipient.mention + "...")
     await bot.say("Happy birthday to you. :)")
 
 
